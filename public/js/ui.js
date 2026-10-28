@@ -8,6 +8,7 @@ import { CUE_DEFS } from './npc.js';
 import { pressButton, releaseButton, holdButton, xpNeed } from './player.js';
 import { serialize, saveLocal, loadLocal, applySave, seasonName, moonName, clockString } from './game.js';
 import { drawMinimap } from './render.js';
+import { setCoyoteStyle } from './rigs.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -17,12 +18,13 @@ const padState = { id: null, x: 0, y: 0 };
 let lastNavY = 0;
 
 // ------------------------------------------------------------------ settings storage
-const defaults = { music: 0.6, sfx: 0.8, quality: 'high', zoom: 11 };
+const defaults = { music: 0.6, sfx: 0.8, quality: 'high', zoom: 9, character: 'classic' };
 export const settings = { ...defaults, ...JSON.parse(localStorage.getItem('coyotepack.settings') || '{}') };
 export function applySettings() {
   audio.setVolumes(settings.music, settings.sfx);
   G.quality = settings.quality;
   G.camD = settings.zoom;
+  setCoyoteStyle(settings.character);
   try { localStorage.setItem('coyotepack.settings', JSON.stringify(settings)); } catch (e) { /* storage may be unavailable */ }
 }
 
@@ -371,7 +373,7 @@ export function updateHud(dt, mctx) {
 }
 
 // ------------------------------------------------------------------ settings
-const TABS = [['stats', 'Stats'], ['controls', 'Controls'], ['account', 'Account'], ['save', 'Save'], ['debug', 'Debug'], ['credits', 'Credits'], ['terms', 'Terms'], ['privacy', 'Privacy']];
+const TABS = [['stats', 'Stats'], ['character', 'Character'], ['controls', 'Controls'], ['account', 'Account'], ['save', 'Save'], ['debug', 'Debug'], ['credits', 'Credits'], ['terms', 'Terms'], ['privacy', 'Privacy']];
 
 export function openSettings(tab) {
   ui.settingsFrom = !$('pause').classList.contains('hidden') ? 'pause' : G.mode === 'play' ? 'play' : 'title';
@@ -401,7 +403,7 @@ function showTab(id) {
     tabs.appendChild(b);
   }
   const body = $('tab-body');
-  const fn = { stats: tabStats, controls: tabControls, account: tabAccount, save: tabSave, debug: tabDebug, credits: tabCredits, terms: tabTerms, privacy: tabPrivacy }[id];
+  const fn = { stats: tabStats, character: tabCharacter, controls: tabControls, account: tabAccount, save: tabSave, debug: tabDebug, credits: tabCredits, terms: tabTerms, privacy: tabPrivacy }[id];
   fn(body);
 }
 
@@ -434,6 +436,15 @@ function tabStats(body) {
     ${row('Coyote signals learned', `${cues} of ${Object.keys(CUE_DEFS).length}`)}
     ${row('Known coyote bonds', bonds)}
   </table>`;
+}
+
+function tabCharacter(body) {
+  const opts = [
+    ['classic', 'Classic Trickster', 'The original sketchy gray coyote in a bowler hat: bouncy, stylized, easy to read.'],
+    ['natural', 'Wild Trotter', 'A more naturalistic, rugged coyote: tan-gray coat, ragged ruff, low head and tail, jointed legs with paws that plant on the ground in a diagonal trot.'],
+  ];
+  body.innerHTML = '<p>Choose how your coyote (and other coyotes) look. This only changes appearance.</p>' + opts.map(([id, name, d]) => `<label class="opt"><input type="radio" name="chr" value="${id}" ${settings.character === id ? 'checked' : ''}><span><b>${name}</b><br>${d}</span></label>`).join('');
+  body.querySelectorAll('input[name=chr]').forEach((r) => { r.onchange = () => { settings.character = r.value; applySettings(); }; });
 }
 
 function tabControls(body) {

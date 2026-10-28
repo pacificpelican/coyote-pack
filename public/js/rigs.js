@@ -3,7 +3,56 @@ const Lm = (f1, u1, s1, f2, u2, s2, w, c, lit) => ({ k: 'l', f1, u1, s1, f2, u2,
 
 const NOSE = [30, 26, 28], EYE = [230, 200, 80], WHITE = [236, 232, 222];
 
-function coyote(e, t) {
+let coyoteStyle = 'classic';
+export function setCoyoteStyle(s) { coyoteStyle = s === 'natural' ? 'natural' : 'classic'; }
+const coyote = (e, t) => (coyoteStyle === 'natural' && !e.sleeping ? coyoteNatural(e, t) : coyoteClassic(e, t));
+
+// Two-segment legs with planted, lifting paws; low head and tail carriage like a trotting coyote.
+function coyoteNatural(e, t) {
+  const m = e.moving || 0, ph0 = e.walk;
+  const fur = e.fur ? [e.fur[0] + 12, e.fur[1] - 4, e.fur[2] - 26] : [142, 128, 106];
+  const back = [96, 88, 78], lt = [216, 206, 186], rust = [168, 112, 80], dk = [58, 50, 46];
+  const crouch = e.crouch || 0, hu = e.headUp || 0;
+  const bob = Math.abs(Math.sin(ph0 * 2)) * 0.035 * m;
+  const hipU = 0.8 + bob - crouch * 0.2;
+  const P = [];
+  // diagonal trot: front-left + hind-right swing together
+  const legs = [[0.45, 0.14, 0, 1], [0.45, -0.14, Math.PI, 1], [-0.42, 0.14, Math.PI, 0], [-0.42, -0.14, 0, 0]];
+  for (const [hf, s, ph, front] of legs) {
+    const a = ph0 + ph, sw = Math.sin(a) * 0.42 * m, lift = Math.max(0, Math.cos(a)) * 0.16 * m;
+    const ff = hf + sw, fu = 0.03 + lift;
+    const shade = s > 0 ? 1 : 0.82;
+    const kf = (hf + ff) / 2 + (front ? 0.04 : -0.14), ku = (hipU - 0.05 + fu) / 2 + (front ? 0.02 : 0.06);
+    P.push(Lm(hf, hipU - 0.05, s, kf, ku, s, front ? 0.13 : 0.16, fur, shade));
+    P.push(Lm(kf, ku, s, ff, fu + 0.05, s, 0.08, [fur[0] * 0.8, fur[1] * 0.8, fur[2] * 0.8], shade));
+    P.push(B(ff + 0.04, fu + 0.03, s, 0.065, dk, shade));
+  }
+  const sway = Math.sin(ph0) * 0.05 * m;
+  P.push(Lm(-0.55, hipU - 0.02, 0, -1.25 - sway, 0.46 + (e.tailUp || 0) * 0.25, sway * 2, 0.22, fur));
+  P.push(B(-1.3 - sway, 0.44 + (e.tailUp || 0) * 0.25, sway * 2, 0.11, dk));
+  P.push(Lm(-0.48, hipU - 0.04, 0, 0.5, hipU + 0.07, 0, 0.44, fur));
+  P.push(Lm(-0.48, hipU + 0.12, 0, 0.5, hipU + 0.2, 0, 0.24, back));
+  P.push(Lm(-0.4, hipU - 0.2, 0, 0.45, hipU - 0.16, 0, 0.26, lt));
+  P.push(B(0.5, hipU + 0.05, 0, 0.27, fur), B(-0.5, hipU - 0.02, 0, 0.25, fur));
+  // ragged ruff along the spine
+  for (let i = 0; i < 6; i++) {
+    const f = -0.4 + i * 0.18, j = Math.sin(t * 17 + i * 3.1) * 0.02;
+    P.push(B(f, hipU + 0.3 + (i % 2) * 0.04 + j, 0, 0.08, back));
+  }
+  const hx = 1.0 - hu * 0.15 - crouch * 0.08, hy = 0.9 + hu * 0.5 - crouch * 0.25 + bob * 0.5;
+  P.push(Lm(0.55, hipU + 0.08, 0, hx - 0.05, hy - 0.02, 0, 0.26, fur));
+  P.push(B(hx, hy, 0, 0.21, fur), B(hx - 0.02, hy - 0.12, 0, 0.17, lt));
+  P.push(Lm(hx + 0.1, hy - 0.03 + hu * 0.04, 0, hx + 0.5, hy - 0.1 + hu * 0.3, 0, 0.12, rust), B(hx + 0.53, hy - 0.1 + hu * 0.3, 0, 0.055, dk));
+  P.push(Lm(hx - 0.04, hy + 0.14, 0.1, hx - 0.2, hy + 0.52, 0.17, 0.13, rust), Lm(hx - 0.04, hy + 0.14, -0.1, hx - 0.2, hy + 0.52, -0.17, 0.13, rust));
+  P.push(B(hx + 0.18, hy + 0.06, 0.1, 0.03, EYE), B(hx + 0.18, hy + 0.06, -0.1, 0.03, EYE));
+  if (e.isPlayer) {
+    P.push(Lm(hx - 0.03, hy + 0.22, -0.26, hx - 0.03, hy + 0.22, 0.26, 0.07, [74, 34, 130]));
+    P.push(B(hx - 0.03, hy + 0.33, 0, 0.19, [109, 53, 184]));
+  }
+  return P;
+}
+
+function coyoteClassic(e, t) {
   const fur = e.fur || [128, 138, 142], dk = [92, 100, 106], lt = [206, 200, 188];
   const m = e.moving || 0, sw = Math.sin(e.walk) * 0.3 * m, bob = Math.abs(Math.sin(e.walk)) * 0.05 * m;
   const P = [];

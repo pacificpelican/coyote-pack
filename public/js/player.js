@@ -16,7 +16,7 @@ export function createPlayer() {
   const s = world.start;
   const p = {
     kind: 'coyote', isPlayer: true, x: s.x, z: s.z, r: 0.5, top: 2.5, h: Math.PI, hp: 100, maxHp: 100, food: 70, water: 70, energy: 100, xp: 0, level: 1,
-    alt: 0, speedNow: 0, lunge: 0, cool: 0, invuln: 0, hurt: 0, kx: 0, kz: 0, eatCd: 0, vx: 0, vz: 0, howlT: 0, fur: [128, 138, 142],
+    alt: 0, walk: 0, moving: 0, speedNow: 0, lunge: 0, cool: 0, invuln: 0, hurt: 0, kx: 0, kz: 0, eatCd: 0, vx: 0, vz: 0, howlT: 0, fur: [128, 138, 142],
   };
   return p;
 }
