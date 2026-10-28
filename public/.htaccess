@@ -1,5 +1,5 @@
 Options -Indexes
-DirectoryIndex index.html
+DirectoryIndex index.html index.php
 
 # Hide dotfiles
 <FilesMatch "^\.">
