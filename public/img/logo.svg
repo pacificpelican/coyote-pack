@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Coyote Pack logo: a gray coyote in a purple bowler hat">
+  <defs>
+    <linearGradient id="hat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8b4fd6"/>
+      <stop offset="1" stop-color="#5a2a9c"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#1d1a1a" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <!-- neck fur -->
+    <path d="M110 330 L150 250 L250 250 L290 330 L250 350 L200 335 L150 350 Z" fill="#8d9aa0"/>
+    <path d="M165 300 L185 335 L200 300 L215 335 L235 300" fill="none" stroke-width="4" stroke="#5f6f77"/>
+    <!-- ears -->
+    <path d="M92 190 L82 70 L170 135 Z" fill="#7d8b92"/>
+    <path d="M308 190 L318 70 L230 135 Z" fill="#7d8b92"/>
+    <path d="M100 160 L96 100 L146 140 Z" fill="#d9a6a0" stroke="none"/>
+    <path d="M300 160 L304 100 L254 140 Z" fill="#d9a6a0" stroke="none"/>
+    <!-- head -->
+    <path d="M85 205 C85 150 140 130 200 130 C260 130 315 150 315 205 C315 250 260 275 235 300 L200 335 L165 300 C140 275 85 250 85 205 Z" fill="#9aa7ad"/>
+    <!-- muzzle -->
+    <path d="M160 245 C170 215 230 215 240 245 C245 285 215 322 200 332 C185 322 155 285 160 245 Z" fill="#e7e2d6"/>
+    <!-- cheek stripes -->
+    <path d="M100 215 L140 225 M102 238 L142 240 M300 215 L260 225 M298 238 L258 240" stroke-width="4" fill="none" stroke="#5f6f77"/>
+    <!-- eyes -->
+    <path d="M128 205 L172 215 L160 232 L130 224 Z" fill="#d9c04a" stroke-width="5"/>
+    <path d="M272 205 L228 215 L240 232 L270 224 Z" fill="#d9c04a" stroke-width="5"/>
+    <circle cx="154" cy="218" r="6" fill="#1d1a1a" stroke="none"/>
+    <circle cx="246" cy="218" r="6" fill="#1d1a1a" stroke="none"/>
+    <!-- nose -->
+    <path d="M182 300 Q200 288 218 300 Q214 322 200 326 Q186 322 182 300 Z" fill="#1d1a1a"/>
+    <path d="M200 326 L200 346 M200 346 Q185 358 172 346 M200 346 Q215 358 228 346" fill="none" stroke-width="4"/>
+    <!-- bowler hat -->
+    <path d="M118 140 C118 62 160 36 200 36 C240 36 282 62 282 140 Z" fill="url(#hat)"/>
+    <path d="M118 140 C118 112 282 112 282 140 Z" fill="#3d1a6e"/>
+    <path d="M60 150 C60 128 150 118 200 118 C250 118 340 128 340 150 C340 172 250 156 200 156 C150 156 60 172 60 150 Z" fill="#6d35b8"/>
+    <path d="M150 62 C165 52 185 48 200 48" fill="none" stroke="#c9a7f2" stroke-width="6"/>
+  </g>
+  <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="30" fill="#3d1a6e" letter-spacing="3">COYOTE PACK</text>
+</svg>

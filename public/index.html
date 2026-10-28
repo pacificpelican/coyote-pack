@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2b1d3d">
+<title>Coyote Pack</title>
+<link rel="icon" type="image/svg+xml" href="img/logo.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="hud-left">
+      <button id="btn-settings" class="chip" aria-label="Settings" title="Settings">⚙️</button>
+      <div id="meters">
+        <div class="meter" title="Health"><span>❤️</span><i><b id="m-health"></b></i></div>
+        <div class="meter" title="Food"><span>🍖</span><i><b id="m-food"></b></i></div>
+        <div class="meter" title="Water"><span>💧</span><i><b id="m-water"></b></i></div>
+        <div class="meter" title="Energy"><span>⚡</span><i><b id="m-energy"></b></i></div>
+        <div class="meter" title="Attention from humans"><span>🚨</span><i><b id="m-heat"></b></i></div>
+      </div>
+      <div id="levelline"></div>
+    </div>
+    <div id="hud-right">
+      <canvas id="minimap" width="140" height="140"></canvas>
+      <div id="clock"></div>
+    </div>
+    <div id="packline"></div>
+    <div id="toasts" aria-live="polite"></div>
+    <div id="hints"><span id="hint-paw"></span><span id="hint-wolf"></span><span id="hint-eat"></span><span id="hint-ok"></span></div>
+  </div>
+
+  <!-- Controls -->
+  <div id="controls" class="hidden">
+    <div id="pad" aria-label="Direction pad"><div id="knob"></div></div>
+    <div id="right-cluster">
+      <div id="small-buttons">
+        <button id="btn-mute" class="chip small" aria-label="Mute" title="Mute (M)">🔊</button>
+        <button id="btn-pause" class="chip small" aria-label="Pause" title="Pause (Esc)">⏸</button>
+      </div>
+      <div id="diamond">
+        <button class="gbtn" id="b-paw" data-btn="paw" aria-label="Interact / socialize">🐾</button>
+        <button class="gbtn" id="b-wolf" data-btn="wolf" aria-label="Wild canine action">🐺</button>
+        <button class="gbtn" id="b-eat" data-btn="eat" aria-label="Eat or drink">🍖</button>
+        <button class="gbtn" id="b-ok" data-btn="ok" aria-label="Select / confirm">✔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div id="title" class="screen">
+    <div class="title-card">
+      <img src="img/logo.svg" alt="Coyote Pack" class="logo">
+      <p class="tag">Lavender Hill never had a coyote. Until now.</p>
+      <div class="title-btns">
+        <button id="t-new" class="big">New Game</button>
+        <button id="t-continue" class="big alt hidden">Continue</button>
+        <button id="t-settings" class="big alt">Settings &amp; Credits</button>
+      </div>
+      <p class="byline">Coyote Pack by <a href="https://altaredwood.work" target="_blank" rel="noopener">Daniel McKeown</a></p>
+    </div>
+  </div>
+
+  <!-- Intro cinematic -->
+  <div id="intro" class="hidden">
+    <div id="intro-text"></div>
+    <div class="intro-btns"><button id="intro-next" class="big">Next</button><button id="intro-skip" class="big alt">Skip</button></div>
+  </div>
+
+  <!-- Dialogue -->
+  <div id="dialogue" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="dlg-card">
+      <div class="dlg-head"><span id="dlg-icon"></span><b id="dlg-name"></b><small id="dlg-src"></small></div>
+      <p id="dlg-text"></p>
+      <div id="dlg-choices"></div>
+    </div>
+  </div>
+
+  <!-- Social minigame -->
+  <div id="social" class="modal hidden">
+    <div class="dlg-card">
+      <div class="dlg-head"><span id="soc-icon">🐺</span><b id="soc-name"></b></div>
+      <p id="soc-text"></p>
+      <div id="soc-cue"></div>
+      <div id="soc-bar"><i></i></div>
+    </div>
+  </div>
+
+  <!-- Action menu (confirm button) -->
+  <div id="menu" class="modal hidden"><div class="dlg-card"><div class="dlg-head"><b>What now?</b></div><div id="menu-items"></div></div></div>
+
+  <!-- Pause -->
+  <div id="pause" class="modal hidden">
+    <div class="dlg-card">
+      <div class="dlg-head"><b>Paused</b></div>
+      <div class="row">
+        <button id="p-resume" class="big">Resume</button>
+        <button id="p-shot" class="big alt">📷 Screenshot</button>
+        <button id="p-settings" class="big alt">Settings</button>
+        <button id="p-title" class="big alt">Title screen</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="shot" class="modal hidden">
+    <div class="dlg-card wide">
+      <div class="dlg-head"><b>Screenshot</b></div>
+      <img id="shot-img" alt="Screenshot">
+      <div class="row"><a id="shot-dl" class="big" download="coyote-pack.png">⬇ Download</a><button id="shot-close" class="big alt">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div id="settings" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="dlg-card wide settings-card">
+      <div class="settings-top"><b>Settings</b><button id="set-close" class="chip" aria-label="Close settings">✖</button></div>
+      <div id="tabs" role="tablist"></div>
+      <div id="tab-body"></div>
+    </div>
+  </div>
+
+  <div id="flash"></div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
