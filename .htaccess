@@ -1,0 +1,11 @@
+# Shared-hosting fallback for when the domain's document root is the repo root.
+# Better: point the document root at public/ in your host's control panel and ignore this file.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Already inside public/ (stops the internal rewrite from looping)
+    RewriteRule ^public/ - [L]
+    # Everything else is served from public/, so src/, data/ and config*.php are never reachable by URL
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
