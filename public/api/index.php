@@ -19,6 +19,14 @@ header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 
 session_name('coyotepack');
+// Shared hosts often have an unwritable or shared default session dir; keep sessions private in data/.
+$sessDir = $root . '/data/sessions';
+if (!is_dir($sessDir)) {
+    @mkdir($sessDir, 0700, true);
+}
+if (is_dir($sessDir) && is_writable($sessDir)) {
+    session_save_path($sessDir);
+}
 session_set_cookie_params([
     'lifetime' => 0, 'path' => '/', 'httponly' => true, 'samesite' => 'Strict',
     'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
