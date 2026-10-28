@@ -1,4 +1,4 @@
-const BASE = 'api/';
+const BASE = 'api/index.php';
 let csrf = '';
 let available = null;
 
