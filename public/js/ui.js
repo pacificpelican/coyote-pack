@@ -8,7 +8,7 @@ import { CUE_DEFS } from './npc.js';
 import { pressButton, releaseButton, holdButton, xpNeed } from './player.js';
 import { serialize, saveLocal, loadLocal, applySave, seasonName, moonName, clockString } from './game.js';
 import { drawMinimap } from './render.js';
-import { setCoyoteStyle } from './rigs.js';
+import { setCoyoteStyle, rigFor } from './rigs.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -438,13 +438,49 @@ function tabStats(body) {
   </table>`;
 }
 
+function previewLoop(cv, style) {
+  const g = cv.getContext('2d');
+  const ent = { kind: 'coyote', isPlayer: true, walk: 0, moving: 1, h: 0, fur: [128, 138, 142] };
+  const col = (c, k = 1) => `rgb(${Math.min(255, c[0] * k) | 0},${Math.min(255, c[1] * k) | 0},${Math.min(255, c[2] * k) | 0})`;
+  const frame = (ts) => {
+    if (!cv.isConnected) return;
+    ent.walk = (ts / 1000) * 5;
+    const keep = settings.character;
+    setCoyoteStyle(style);
+    const parts = rigFor(ent, ts / 1000);
+    setCoyoteStyle(keep);
+    const sc = 62, ox = cv.width / 2 - 8, oy = cv.height - 14;
+    g.clearRect(0, 0, cv.width, cv.height);
+    g.fillStyle = 'rgba(60,40,20,0.2)';
+    g.fillRect(0, oy, cv.width, 2);
+    g.lineCap = 'round';
+    const sideOf = (p) => (p.k === 'b' ? p.s : (p.s1 + p.s2) / 2);
+    parts.sort((a, b) => sideOf(a) - sideOf(b));
+    for (const p of parts) {
+      const k = (p.lit || 1) * 0.95;
+      if (p.k === 'b') {
+        g.beginPath(); g.arc(ox + p.f * sc, oy - p.u * sc, Math.max(1, p.r * sc), 0, Math.PI * 2);
+        g.fillStyle = col(p.c, k); g.fill(); g.strokeStyle = '#1d1a1a'; g.lineWidth = 1.5; g.stroke();
+      } else {
+        const w = Math.max(2, p.w * sc);
+        g.beginPath(); g.moveTo(ox + p.f1 * sc, oy - p.u1 * sc); g.lineTo(ox + p.f2 * sc, oy - p.u2 * sc);
+        g.strokeStyle = '#1d1a1a'; g.lineWidth = w + 3; g.stroke();
+        g.strokeStyle = col(p.c, k); g.lineWidth = w; g.stroke();
+      }
+    }
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+
 function tabCharacter(body) {
   const opts = [
     ['classic', 'Classic Trickster', 'The original sketchy gray coyote in a bowler hat: bouncy, stylized, easy to read.'],
     ['natural', 'Wild Trotter', 'A more naturalistic, rugged coyote: tan-gray coat, ragged ruff, low head and tail, jointed legs with paws that plant on the ground in a diagonal trot.'],
   ];
-  body.innerHTML = '<p>Choose how your coyote (and other coyotes) look. This only changes appearance.</p>' + opts.map(([id, name, d]) => `<label class="opt"><input type="radio" name="chr" value="${id}" ${settings.character === id ? 'checked' : ''}><span><b>${name}</b><br>${d}</span></label>`).join('');
+  body.innerHTML = '<p>Choose how your coyote (and other coyotes) look. The change applies immediately; close Settings to see it in the world.</p>' + opts.map(([id, name, d]) => `<label class="opt"><input type="radio" name="chr" value="${id}" ${settings.character === id ? 'checked' : ''}><canvas width="200" height="110" data-style="${id}"></canvas><span><b>${name}</b><br>${d}</span></label>`).join('');
   body.querySelectorAll('input[name=chr]').forEach((r) => { r.onchange = () => { settings.character = r.value; applySettings(); }; });
+  body.querySelectorAll('canvas').forEach((c) => previewLoop(c, c.dataset.style));
 }
 
 function tabControls(body) {

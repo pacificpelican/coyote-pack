@@ -28,7 +28,7 @@ function coyoteNatural(e, t) {
     P.push(B(ff + 0.04, fu + 0.03, s, 0.065, dk, shade));
   }
   const sway = Math.sin(ph0) * 0.05 * m;
-  P.push(Lm(-0.55, hipU - 0.02, 0, -1.25 - sway, 0.46 + (e.tailUp || 0) * 0.25, sway * 2, 0.22, fur));
+  P.push(Lm(-0.55, hipU - 0.02, 0, -1.25 - sway, 0.46 + (e.tailUp || 0) * 0.25, sway * 2, 0.16, fur));
   P.push(B(-1.3 - sway, 0.44 + (e.tailUp || 0) * 0.25, sway * 2, 0.11, dk));
   P.push(Lm(-0.48, hipU - 0.04, 0, 0.5, hipU + 0.07, 0, 0.44, fur));
   P.push(Lm(-0.48, hipU + 0.12, 0, 0.5, hipU + 0.2, 0, 0.24, back));
@@ -42,8 +42,8 @@ function coyoteNatural(e, t) {
   const hx = 1.0 - hu * 0.15 - crouch * 0.08, hy = 0.9 + hu * 0.5 - crouch * 0.25 + bob * 0.5;
   P.push(Lm(0.55, hipU + 0.08, 0, hx - 0.05, hy - 0.02, 0, 0.26, fur));
   P.push(B(hx, hy, 0, 0.21, fur), B(hx - 0.02, hy - 0.12, 0, 0.17, lt));
-  P.push(Lm(hx + 0.1, hy - 0.03 + hu * 0.04, 0, hx + 0.5, hy - 0.1 + hu * 0.3, 0, 0.12, rust), B(hx + 0.53, hy - 0.1 + hu * 0.3, 0, 0.055, dk));
-  P.push(Lm(hx - 0.04, hy + 0.14, 0.1, hx - 0.2, hy + 0.52, 0.17, 0.13, rust), Lm(hx - 0.04, hy + 0.14, -0.1, hx - 0.2, hy + 0.52, -0.17, 0.13, rust));
+  P.push(Lm(hx + 0.1, hy - 0.03 + hu * 0.04, 0, hx + 0.5, hy - 0.1 + hu * 0.3, 0, 0.09, [196, 176, 146]), B(hx + 0.53, hy - 0.1 + hu * 0.3, 0, 0.055, dk));
+  P.push(Lm(hx - 0.04, hy + 0.14, 0.1, hx - 0.2, hy + 0.46, 0.15, 0.09, rust), Lm(hx - 0.04, hy + 0.14, -0.1, hx - 0.2, hy + 0.46, -0.15, 0.09, rust));
   P.push(B(hx + 0.18, hy + 0.06, 0.1, 0.03, EYE), B(hx + 0.18, hy + 0.06, -0.1, 0.03, EYE));
   if (e.isPlayer) {
     P.push(Lm(hx - 0.03, hy + 0.22, -0.26, hx - 0.03, hy + 0.22, 0.26, 0.07, [74, 34, 130]));
