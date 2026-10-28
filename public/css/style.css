@@ -98,6 +98,9 @@ a { color: #cba8ff; }
 .dlg-head small { margin-left: auto; font-size: 11px; opacity: .6; }
 #dlg-text { font-size: 17px; line-height: 1.4; min-height: 3.2em; margin: 6px 0 10px; }
 #dlg-choices, #menu-items { display: grid; gap: 6px; }
+#dlg-form { display: flex; gap: 6px; margin-top: 8px; }
+#dlg-form.hidden { display: none; }
+#dlg-input { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 10px; border: 2px solid var(--ink); background: #fff; color: var(--ink); font-size: 15px; }
 .choice { padding: 8px 12px; border-radius: 10px; border: 2px solid var(--ink); background: #e6dcf8; text-align: left; font-size: 15px; color: var(--ink); }
 .choice.sel { background: #bfa4f2; outline: 3px solid var(--purple); }
 .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }

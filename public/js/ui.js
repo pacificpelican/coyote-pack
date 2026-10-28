@@ -104,7 +104,10 @@ function bindControls() {
 
   const KEYMAP = { j: 'paw', z: 'paw', k: 'wolf', x: 'wolf', l: 'eat', c: 'eat', v: 'ok', Enter: 'ok', ' ': 'ok' };
   window.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT') return;
+    if (e.target.tagName === 'INPUT') {
+      if (e.key === 'Escape' && G.dialogue) { e.preventDefault(); closeDialogue(); }
+      return;
+    }
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (k === 'Escape') { e.preventDefault(); onEscape(); return; }
     if (k === 'm') { toggleMute(); return; }
@@ -124,6 +127,7 @@ function bindControls() {
     }
   });
   window.addEventListener('keyup', (e) => {
+    if (e.target.tagName === 'INPUT') return;
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (KEYMAP[k]) { btnUp(KEYMAP[k]); return; }
     if (k === 'q') G.qHeld = false;
@@ -224,6 +228,8 @@ export function openDialogue(spec) {
   $('dlg-name').textContent = spec.name;
   $('dlg-src').textContent = '';
   $('dlg-choices').innerHTML = '';
+  $('dlg-form').classList.add('hidden');
+  $('dlg-input').value = '';
   $('dlg-text').textContent = '…';
   speak(spec.speaker, 'greet', ctxNow()).then((r) => {
     if (!G.dialogue || G.dialogue.spec !== spec) return;
@@ -237,6 +243,7 @@ function renderChoices() {
   if (!d) return;
   const box = $('dlg-choices');
   box.innerHTML = '';
+  $('dlg-form').classList.remove('hidden');
   d.spec.choices.forEach((c, i) => {
     const b = document.createElement('button');
     b.className = 'choice' + (i === d.sel ? ' sel' : '');
@@ -252,6 +259,7 @@ function chooseDialogue() {
   const ch = d.spec.choices[d.sel];
   d.busy = true;
   $('dlg-choices').innerHTML = '';
+  $('dlg-form').classList.add('hidden');
   $('dlg-text').textContent = '…';
   const res = d.spec.onChoice(ch.id) || {};
   speak(d.spec.speaker, ch.topic, ctxNow()).then((r) => {
@@ -259,16 +267,40 @@ function chooseDialogue() {
     $('dlg-src').textContent = r.source === 'ai' ? 'AI' : '';
     const text = res.extra ? `${r.text}\n\n${res.extra}` : r.text;
     typeText($('dlg-text'), text, () => {
+      if (ch.end) { setTimeout(() => { if (G.dialogue === d) closeDialogue(); }, 1400); return; }
       d.busy = false;
-      if (ch.end) d.spec.choices = [{ id: 'close', label: 'Close', topic: 'bye', close: true }];
       d.sel = 0;
       renderChoices();
     });
   });
 }
 
+function sayDialogue(ev) {
+  ev.preventDefault();
+  const d = G.dialogue;
+  const input = $('dlg-input');
+  const msg = input.value.trim().slice(0, 120);
+  if (!d || d.busy || !msg) return;
+  input.value = '';
+  input.blur();
+  d.busy = true;
+  $('dlg-choices').innerHTML = '';
+  $('dlg-form').classList.add('hidden');
+  $('dlg-text').textContent = '…';
+  speak(d.spec.speaker, 'say', ctxNow(), msg).then((r) => {
+    if (G.dialogue !== d) return;
+    $('dlg-src').textContent = r.source === 'ai' ? 'AI' : '';
+    typeText($('dlg-text'), r.text, () => { d.busy = false; d.sel = 0; renderChoices(); });
+  });
+}
+
+export function initDialogueInput() {
+  $('dlg-form').addEventListener('submit', sayDialogue);
+}
+
 function closeDialogue() {
   clearInterval(typeTimer);
+  $('dlg-input').blur();
   G.dialogue = null;
   $('dialogue').classList.add('hidden');
 }
@@ -655,6 +687,7 @@ function tabPrivacy(body) {
 // ------------------------------------------------------------------ boot
 export function initUI() {
   bindControls();
+  initDialogueInput();
   applySettings();
   G.ui = {
     toast, openDialogue, openMenu, socialChanged, modalPress,

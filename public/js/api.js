@@ -37,5 +37,5 @@ export const api = {
   load: () => call('load'),
   save: (data) => call('save', { data }),
   debug: (ping) => call('debug', null, ping ? '&ping=1' : ''),
-  dialogue: (speaker, topic, ctx) => (available === false ? Promise.resolve(null) : call('dialogue', { speaker, topic, ctx })),
+  dialogue: (speaker, topic, ctx, message) => (available === false ? Promise.resolve(null) : call('dialogue', { speaker, topic, ctx, message })),
 };

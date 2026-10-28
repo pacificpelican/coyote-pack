@@ -215,7 +215,7 @@ switch ($action) {
         }
         $_SESSION['last_ai'] = $now;
         session_write_close();
-        $text = $ai->reply((string)($b['speaker'] ?? ''), (string)($b['topic'] ?? ''), is_array($b['ctx'] ?? null) ? $b['ctx'] : []);
+        $text = $ai->reply((string)($b['speaker'] ?? ''), (string)($b['topic'] ?? ''), is_array($b['ctx'] ?? null) ? $b['ctx'] : [], (string)($b['message'] ?? ''));
         out(['ok' => true, 'text' => $text, 'source' => $text === null ? 'default' : 'ai']);
 
     default:

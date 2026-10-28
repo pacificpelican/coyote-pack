@@ -65,9 +65,9 @@ export function defaultLine(speaker, topic) {
   return pick(t[topic] || t.chat || t.greet || ['...']);
 }
 
-export async function speak(speaker, topic, ctx) {
+export async function speak(speaker, topic, ctx, message) {
   try {
-    const r = await api.dialogue(speaker, topic, ctx);
+    const r = await api.dialogue(speaker, topic, ctx, message);
     if (r && r.text) return { text: r.text, source: 'ai' };
   } catch (e) { /* fall through to built-in lines */ }
   return { text: defaultLine(speaker, topic), source: 'default' };
