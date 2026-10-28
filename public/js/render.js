@@ -183,7 +183,7 @@ function skyDir(dx, dy, dz, out) {
 function horizonY() { return cam.cy - Math.tan(cam.pitch) * cam.focal; }
 
 function ridge(az, k) {
-  return 0.5 + 0.28 * Math.sin(az * 3 + k) + 0.17 * Math.sin(az * 7 + k * 2) + 0.07 * Math.sin(az * 17 + k * 3);
+  return 0.5 + 0.28 * Math.sin(az * 3 + k) + 0.17 * Math.sin(az * 7 + k * 2) + 0.04 * Math.sin(az * 11 + k * 3);
 }
 
 function drawSky(G, W, H) {
@@ -236,8 +236,8 @@ function drawSky(G, W, H) {
   }
   // mountains: western range (Olympics-like) and eastern foothills
   const baseY = hy;
-  const mt = mix(L.skyHor, [86, 92, 140], 0.55 - L.night * 0.2 - G.rain * 0.2);
-  const mt2 = mix(L.skyHor, [70, 84, 120], 0.4);
+  const mt = mix(L.skyHor, mix([86, 92, 140], [36, 42, 84], L.night), 0.55 - L.night * 0.2 - G.rain * 0.2);
+  const mt2 = mix(L.skyHor, mix([70, 84, 120], [32, 38, 76], L.night), 0.4);
   for (const [col, hmul, k] of [[mt2, 0.2, 2], [mt, 0.15, 0.5]]) {
     ctx.fillStyle = 'rgb(' + col.map((v) => v | 0).join(',') + ')';
     ctx.beginPath();
@@ -906,6 +906,7 @@ export function draw(c, G, W, H, dt) {
     if (q.t === 1) { drawEntity(s, q.fw); continue; }
     if (q.t === 2) { drawItem(s, q.fw); continue; }
     const d = Math.max(1, q.fw);
+    if (d > 14 && (s.t === 'tree' || s.t === 'bush' || s.t === 'rock' || s.t === 'bin' || s.t === 'lamp') && hiddenByTerrain(s, d)) continue;
     switch (s.t) {
       case 'box': drawBox(s, d); break;
       case 'gable': drawGable(s, d); break;
@@ -923,6 +924,18 @@ export function draw(c, G, W, H, dt) {
   drawLabels(G);
   drawWeather(G, W, H, dt);
   drawOverlay(G, W, H);
+}
+
+// Painter's order draws props over all terrain, so props behind a crest need an explicit line-of-sight test.
+function hiddenByTerrain(s, d) {
+  const ty = (s.y ?? groundH(s.x, s.z)) + 4 * (s.s || 1);
+  const n = Math.min(24, Math.ceil(d / 4));
+  for (let k = 1; k < n; k++) {
+    const t = k / n;
+    const x = cam.x + (s.x - cam.x) * t, z = cam.z + (s.z - cam.z) * t;
+    if (groundH(x, z) > cam.y + (ty - cam.y) * t + 0.2) return true;
+  }
+  return false;
 }
 
 function drawLabels(G) {
