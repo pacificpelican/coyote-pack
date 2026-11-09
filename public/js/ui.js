@@ -142,6 +142,7 @@ function bindControls() {
   let drag = null;
   const touches = new Map();
   cv.addEventListener('pointerdown', (e) => {
+    console.log('pointerdown:', { pointerType: e.pointerType, button: e.button, touches: touches.size + 1 });
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (e.pointerType === 'touch' && touches.size === 1) {
@@ -152,6 +153,7 @@ function bindControls() {
   cv.addEventListener('pointermove', (e) => {
     const touch = touches.get(e.pointerId);
     if (!touch) return;
+    if (touches.size === 2) console.log('pointermove with 2 touches:', { pointerType: e.pointerType, touches: touches.size });
     touch.x = e.clientX;
     touch.y = e.clientY;
     if (touches.size === 2 && e.pointerType === 'touch') {
@@ -179,8 +181,16 @@ function bindControls() {
     if (touches.size < 2) touches.lastDist = undefined;
     if (drag?.id === e.pointerId) drag = null;
   });
-  cv.addEventListener('wheel', (e) => { settings.zoom = clamp(settings.zoom + Math.sign(e.deltaY), 7, 18); applySettings(); }, { passive: true });
+  cv.addEventListener('wheel', (e) => { 
+    console.log('wheel event:', { deltaY: e.deltaY, ctrlKey: e.ctrlKey, metaKey: e.metaKey, buttons: e.buttons });
+    settings.zoom = clamp(settings.zoom + Math.sign(e.deltaY), 7, 18); 
+    applySettings(); 
+  }, { passive: true });
   document.addEventListener('gesturestart', (e) => e.preventDefault());
+  document.addEventListener('gesturechange', (e) => {
+    console.log('gesturechange event:', { scale: e.scale });
+    e.preventDefault();
+  });
   document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 }
 
