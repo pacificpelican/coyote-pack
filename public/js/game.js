@@ -40,7 +40,7 @@ export function startIntro() {
   G.mode = 'intro';
   G.intro = { t: 0, beat: 0 };
   const p = G.player;
-  p.x = 200; p.z = -110; p.h = Math.PI;
+  p.x = 260; p.z = -110; p.h = Math.PI;
   world.bridgeAng = 0;
 }
 
