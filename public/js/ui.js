@@ -137,13 +137,50 @@ function bindControls() {
   });
   window.addEventListener('blur', () => { keys.clear(); recomputeKeys(); for (const b of ['paw', 'wolf', 'eat', 'ok']) btnUp(b); });
 
-  // drag on the game view rotates the camera; wheel zooms
+  // drag on the game view rotates the camera; wheel zooms; pinch zooms
   const cv = $('game');
   let drag = null;
-  cv.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; drag = { id: e.pointerId, x: e.clientX }; cv.setPointerCapture(e.pointerId); });
-  cv.addEventListener('pointermove', (e) => { if (drag && drag.id === e.pointerId) { G.camYaw += (e.clientX - drag.x) * 0.006; drag.x = e.clientX; } });
-  cv.addEventListener('pointerup', () => { drag = null; });
+  const touches = new Map();
+  cv.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (e.pointerType === 'touch' && touches.size === 1) {
+      drag = { id: e.pointerId, x: e.clientX };
+      cv.setPointerCapture(e.pointerId);
+    }
+  });
+  cv.addEventListener('pointermove', (e) => {
+    const touch = touches.get(e.pointerId);
+    if (!touch) return;
+    touch.x = e.clientX;
+    touch.y = e.clientY;
+    if (touches.size === 2 && e.pointerType === 'touch') {
+      drag = null;
+      const [t1, t2] = Array.from(touches.values());
+      const dist = Math.hypot(t2.x - t1.x, t2.y - t1.y);
+      if (!touches.lastDist) { touches.lastDist = dist; return; }
+      const delta = dist - touches.lastDist;
+      touches.lastDist = dist;
+      settings.zoom = clamp(settings.zoom - Math.sign(delta), 7, 18);
+      applySettings();
+    } else if (drag && drag.id === e.pointerId) {
+      G.camYaw += (e.clientX - drag.x) * 0.006;
+      drag.x = e.clientX;
+    }
+  });
+  cv.addEventListener('pointerup', (e) => {
+    touches.delete(e.pointerId);
+    if (touches.size < 2) touches.lastDist = undefined;
+    if (drag?.id === e.pointerId) drag = null;
+  });
+  cv.addEventListener('pointercancel', (e) => {
+    touches.delete(e.pointerId);
+    if (touches.size < 2) touches.lastDist = undefined;
+    if (drag?.id === e.pointerId) drag = null;
+  });
   cv.addEventListener('wheel', (e) => { settings.zoom = clamp(settings.zoom + Math.sign(e.deltaY), 7, 18); applySettings(); }, { passive: true });
+  document.addEventListener('gesturestart', (e) => e.preventDefault());
+  document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 }
 
 function onEscape() {
