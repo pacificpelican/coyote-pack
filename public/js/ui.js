@@ -161,6 +161,7 @@ function bindControls() {
       if (!touches.lastDist) { touches.lastDist = dist; return; }
       const delta = dist - touches.lastDist;
       touches.lastDist = dist;
+      console.log(`Pinch detected: delta=${delta}, new zoom=${clamp(settings.zoom - Math.sign(delta), 7, 18)}`);
       settings.zoom = clamp(settings.zoom - Math.sign(delta), 7, 18);
       applySettings();
     } else if (drag && drag.id === e.pointerId) {
