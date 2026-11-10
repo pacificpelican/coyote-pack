@@ -33,7 +33,8 @@ By [Daniel McKeown](https://altaredwood.work).
 | 🐺 / `K` or `X` | Act wild: pounce, growl, rip bags, tip bins. Tap to bark, hold to howl |
 | 🍖 / `L` or `C` | Eat or drink (hold to keep going) |
 | ✔ / `V`, `Enter` or `Space` | Select, and open the action menu (sleep, cast flight, release pack) |
-| `Q` / `E`, mouse wheel, drag | Rotate and zoom the camera |
+| `Q` / `E`, mouse or one-finger drag | Rotate the camera |
+| Mouse wheel / two-finger pinch | Zoom the camera |
 | `Esc` / `M` | Pause / mute |
 
 ## Quick start

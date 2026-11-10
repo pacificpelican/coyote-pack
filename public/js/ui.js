@@ -9,6 +9,7 @@ import { pressButton, releaseButton, holdButton, xpNeed } from './player.js';
 import { serialize, saveLocal, loadLocal, applySave, seasonName, moonName, clockString } from './game.js';
 import { drawMinimap } from './render.js';
 import { setCoyoteStyle, rigFor } from './rigs.js';
+import { bindCameraControls } from './camera-controls.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -137,54 +138,11 @@ function bindControls() {
   });
   window.addEventListener('blur', () => { keys.clear(); recomputeKeys(); for (const b of ['paw', 'wolf', 'eat', 'ok']) btnUp(b); });
 
-  // drag on the game view rotates the camera; wheel zooms; pinch zooms
-  const cv = $('game');
-  let drag = null;
-  const touches = new Map();
-  cv.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (e.pointerType === 'touch' && touches.size === 1) {
-      drag = { id: e.pointerId, x: e.clientX };
-      cv.setPointerCapture(e.pointerId);
-    }
+  bindCameraControls($('game'), (delta) => { G.camYaw += delta; }, (delta) => {
+    if (!delta) return;
+    settings.zoom = clamp(settings.zoom + delta, 7, 18);
+    applySettings();
   });
-  cv.addEventListener('pointermove', (e) => {
-    const touch = touches.get(e.pointerId);
-    if (!touch) return;
-    touch.x = e.clientX;
-    touch.y = e.clientY;
-    if (touches.size === 2 && e.pointerType === 'touch') {
-      drag = null;
-      const [t1, t2] = Array.from(touches.values());
-      const dist = Math.hypot(t2.x - t1.x, t2.y - t1.y);
-      if (!touches.lastDist) { touches.lastDist = dist; return; }
-      const delta = dist - touches.lastDist;
-      touches.lastDist = dist;
-      settings.zoom = clamp(settings.zoom - Math.sign(delta), 7, 18);
-      applySettings();
-    } else if (drag && drag.id === e.pointerId) {
-      G.camYaw += (e.clientX - drag.x) * 0.006;
-      drag.x = e.clientX;
-    }
-  });
-  cv.addEventListener('pointerup', (e) => {
-    touches.delete(e.pointerId);
-    if (touches.size < 2) touches.lastDist = undefined;
-    if (drag?.id === e.pointerId) drag = null;
-  });
-  cv.addEventListener('pointercancel', (e) => {
-    touches.delete(e.pointerId);
-    if (touches.size < 2) touches.lastDist = undefined;
-    if (drag?.id === e.pointerId) drag = null;
-  });
-  cv.addEventListener('wheel', (e) => { 
-    if (e.ctrlKey) {
-      e.preventDefault();
-      settings.zoom = clamp(settings.zoom + Math.sign(e.deltaY), 7, 18); 
-      applySettings();
-    }
-  }, { passive: false });
   document.addEventListener('gesturestart', (e) => e.preventDefault());
   document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 }
@@ -573,7 +531,7 @@ function tabControls(body) {
     <h3>Keyboard</h3>
     <table>
       ${row('Move', 'WASD or arrow keys (Shift = run, Ctrl = sneak)')}
-      ${row('Camera', 'Q / E to rotate, mouse wheel to zoom, or drag')}
+      ${row('Camera', 'Q / E or drag to rotate, mouse wheel or two-finger pinch to zoom')}
       ${row('Buttons', 'J or Z = 🐾 · K or X = 🐺 · L or C = 🍖 · V, Enter or Space = ✔')}
       ${row('Pause / mute', 'Esc / M')}
     </table>
